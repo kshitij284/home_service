@@ -1,0 +1,102 @@
+#include <ros/ros.h>
+#include <visualization_msgs/Marker.h>
+#include "nav_msgs/Odometry.h"
+#include <cmath>
+#include <std_msgs/Int32.h>
+
+int pickup_x = 37;
+int pickup_y = 37;
+int drop_x = 40;
+int drop_y = 50;
+ros::Publisher marker_pub;
+
+void checkLocation(const std_msgs::Int32::ConstPtr& msg)
+{ 
+  if(msg->data == 1){
+
+    visualization_msgs::Marker marker;
+
+    uint32_t shape = visualization_msgs::Marker::CUBE;
+    marker.header.frame_id = "map";
+    marker.type = shape;
+    marker.action = visualization_msgs::Marker::ADD;
+    marker.pose.position.x = pickup_x;
+    marker.pose.position.y = pickup_y;
+    marker.pose.position.z = 0;
+    marker.color.r = 0.0f;
+    marker.color.g = 1.0f;
+    marker.color.b = 0.0f;
+    marker.color.a = 1.0;
+    marker.scale.x = 1.0;
+    marker.scale.y = 1.0;
+    marker.scale.z = 1.0;
+
+    marker.lifetime = ros::Duration();
+    marker_pub.publish(marker);
+   
+  }
+  else if(msg->data == 2){
+    visualization_msgs::Marker marker;
+
+    uint32_t shape = visualization_msgs::Marker::CUBE;
+    marker.header.frame_id = "map";
+    marker.type = shape;
+    marker.action = visualization_msgs::Marker::ADD;
+    marker.pose.position.x = pickup_x;
+    marker.pose.position.y = pickup_y;
+    marker.pose.position.z = 0;
+    marker.color.r = 0.0f;
+    marker.color.g = 1.0f;
+    marker.color.b = 0.0f;
+    marker.color.a = 0.0;
+    marker.scale.x = 1.0;
+    marker.scale.y = 1.0;
+    marker.scale.z = 1.0;
+
+    marker.lifetime = ros::Duration();
+    marker_pub.publish(marker);
+    
+  }
+  else if(msg->data ==3){
+    ROS_INFO("Reached Drop-Off");
+    visualization_msgs::Marker marker;
+
+    uint32_t shape = visualization_msgs::Marker::CUBE;
+    marker.header.frame_id = "map";
+    marker.type = shape;
+    marker.action = visualization_msgs::Marker::ADD;
+    marker.pose.position.x = drop_x;
+    marker.pose.position.y = drop_y;
+    marker.pose.position.z = 0;
+    marker.color.r = 0.0f;
+    marker.color.g = 1.0f;
+    marker.color.b = 0.0f;
+    marker.color.a = 1.0;
+    marker.scale.x = 1.0;
+    marker.scale.y = 1.0;
+    marker.scale.z = 1.0;
+
+    marker.lifetime = ros::Duration();
+    marker_pub.publish(marker);
+  }
+  else{
+   ROS_INFO("Waiting");
+
+   }
+}
+
+int main( int argc, char** argv )
+{
+  ros::init(argc, argv, "add_markers");
+  ros::NodeHandle n;
+  ros::Rate r(10);
+  marker_pub = n.advertise<visualization_msgs::Marker>("object_marker", 1);
+  
+  ros::Subscriber get_location_info = n.subscribe("location_update", 1, checkLocation);
+  while(ros::ok()){
+    ros::spinOnce();
+    r.sleep();
+  }
+  return 0;
+}
+
